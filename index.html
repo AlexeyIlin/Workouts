@@ -28,7 +28,9 @@ h1{font-size:clamp(24px,7.5vw,34px);margin:0;font-weight:600}
 .gl{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
 .gl span{position:absolute;left:-34px;top:-9px;font-size:13px;width:28px;text-align:right}
 .bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:5px;padding:0 2px}
-.bar{flex:1;background:#000;border-radius:4px 4px 0 0;min-height:2px}
+.bar{flex:1;position:relative;background:#000;border-radius:4px 4px 0 0;min-height:2px}
+.bar span{position:absolute;top:5px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:600}
+.bar.sm span{top:auto;bottom:100%;margin-bottom:2px;color:#000}
 .xl{display:flex;gap:5px;margin:6px 0 0 36px;font-size:11px}
 .xl div{flex:1;white-space:nowrap}
 .row{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #eee}
@@ -188,7 +190,7 @@ function renderMain(){
   const step=Math.max(10,Math.ceil(Math.max(...tot)/40)*10);
   const max=Math.ceil(Math.max(...tot)/step)*step;
   let g="";for(let v=0;v<=max;v+=step)g+=`<div class="gl" style="bottom:${v/max*100}%"><span>${v}</span></div>`;
-  const bars=tot.map(t=>`<div class="bar" style="height:${t/max*100}%"></div>`).join("");
+  const bars=tot.map(t=>`<div class="bar${t/max*190<20?" sm":""}" style="height:${t/max*100}%"><span>${t}</span></div>`).join("");
   const xl=last.map((s,i)=>`<div>${i%2===0?fmtDate(s.date):""}</div>`).join("");
   const rows=ss.slice().reverse().map(s=>`<div class="row"><div class="d">${fmtDate(s.date)}</div>${s.sets.map(v=>`<div class="chip">${v}</div>`).join("")}</div>`).join("");
   $("statWrap").innerHTML=`<div class="chart">${g}<div class="bars">${bars}</div></div><div class="xl">${xl}</div><div style="margin-top:24px">${rows}</div>`;
