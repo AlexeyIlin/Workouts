@@ -21,8 +21,8 @@ h1{font-size:clamp(24px,7.5vw,34px);margin:0;font-weight:600}
 .titlebox{display:flex;align-items:baseline;gap:10px;white-space:nowrap;min-width:0}
 .icon{font-size:30px;padding:6px}
 .lvtag{font-size:clamp(15px,4.4vw,19px);color:#888;margin:0}
-.tabs{display:flex;gap:8px;margin-bottom:22px}
-.tabs button{flex:1;height:42px;border-radius:16px;background:var(--chip);font-size:15px}
+.tabs{display:flex;gap:5px;margin-bottom:22px}
+.tabs button{flex:1 1 0;min-width:0;height:42px;padding:0 2px;border-radius:14px;background:var(--chip);font-size:clamp(10px,3.1vw,14px);white-space:nowrap;overflow:hidden}
 .tabs .on{background:var(--btn);color:#fff}
 .chart{position:relative;height:190px;margin:8px 0 0 34px;border-left:1px solid #999;border-bottom:1px solid #999}
 .gl{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
@@ -110,16 +110,19 @@ const PULL=[[6,5,5,4,3],[7,6,5,4,4],[8,6,5,5,4],[8,7,5,5,5],[9,7,6,5,5],[10,7,6,
 const PUSH=[[10,10,5,5,5],[15,10,10,10,5],[20,20,15,15,10],[25,25,20,15,10],[30,30,25,20,15],[35,30,25,20,15],[40,35,25,25,15],[40,40,30,30,20],[45,40,35,35,25],[45,45,35,35,25],[50,45,35,35,30],[50,50,40,40,35],[55,50,40,40,35],[60,55,40,40,35],[60,60,45,45,40],[65,60,45,45,40],[65,65,45,45,40]];
 // Приседания: 15-недельная таблица (неделя = уровень) + 30 уровней продолжения (до 45)
 const SQUAT=[[8,10,8,8,6],[10,12,10,10,8],[10,15,12,12,10],[15,15,15,15,12],[15,20,18,16,12],[15,20,20,20,15],[20,25,20,20,20],[20,25,25,25,20],[25,30,30,25,20],[25,30,30,30,25],[30,30,35,30,25],[30,35,35,30,30],[30,40,35,35,30],[35,40,35,35,35],[40,40,40,40,40],[45,45,40,40,40],[45,45,45,45,40],[50,50,45,45,40],[50,50,50,45,45],[55,55,50,45,45],[55,55,50,50,50],[60,55,55,50,50],[60,60,55,55,50],[60,60,60,55,55],[65,65,60,55,55],[65,65,65,60,55],[70,65,65,60,60],[70,70,65,65,60],[75,70,70,65,60],[75,75,70,65,65],[80,75,70,70,65],[80,80,75,70,65],[80,80,75,75,70],[85,80,80,75,70],[85,85,80,75,75],[90,85,85,75,75],[90,90,85,80,75],[90,90,90,80,80],[95,90,90,85,80],[95,95,90,85,85],[100,95,90,90,85],[100,100,95,90,85],[100,100,100,90,90],[105,100,100,95,90],[105,105,100,95,95]];
+// Брусья: 17-недельная таблица (неделя = уровень)
+const DIPS=[[10,5,5,3,2],[15,15,10,5,5],[20,20,15,15,10],[25,25,20,15,10],[30,30,25,20,15],[35,30,25,20,15],[40,35,25,25,15],[40,40,30,30,20],[45,40,35,35,25],[45,45,35,35,25],[50,45,35,35,30],[50,50,40,40,35],[55,50,40,40,35],[60,55,40,40,35],[60,60,45,45,40],[65,60,45,45,40],[65,65,45,45,40]];
 const EX={
   pull:{name:"Подтягивания",start:"Начать подтягивания",levels:PULL},
   push:{name:"Отжимания",start:"Начать отжимания",levels:PUSH},
-  squat:{name:"Приседания",start:"Начать приседания",levels:SQUAT}
+  squat:{name:"Приседания",start:"Начать приседания",levels:SQUAT},
+  dips:{name:"Брусья",start:"Начать брусья",levels:DIPS}
 };
 const IDS=Object.keys(EX);
-const DEF={pull:{level:1,rest:120},push:{level:1,rest:90},squat:{level:1,rest:120}};
+const DEF={pull:{level:1,rest:120},push:{level:1,rest:90},squat:{level:1,rest:120},dips:{level:1,rest:120}};
 const KEY="pullups_data_txt";
 const $=id=>document.getElementById(id);
-const fresh=()=>({mute:false,cur:"pull",ex:{pull:{...DEF.pull},push:{...DEF.push},squat:{...DEF.squat}},sessions:[]});
+const fresh=()=>({mute:false,cur:"pull",ex:{pull:{...DEF.pull},push:{...DEF.push},squat:{...DEF.squat},dips:{...DEF.dips}},sessions:[]});
 let S=fresh();
 const E=()=>S.ex[S.cur], LV=()=>EX[S.cur].levels;
 
@@ -141,11 +144,11 @@ function parse(t){
   const n=fresh();let m,ver=1;const ex={};
   t.split(/\r?\n/).forEach(l=>{l=l.trim();
     if(m=l.match(/^(level|rest)=(\d+)$/))n.ex.pull[m[1]]=+m[2];
-    else if(m=l.match(/^(pull|push|squat)\.(level|rest)=(\d+)$/)){n.ex[m[1]][m[2]]=+m[3];if(m[2]==="level")ex[m[1]]=1}
+    else if(m=l.match(/^(pull|push|squat|dips)\.(level|rest)=(\d+)$/)){n.ex[m[1]][m[2]]=+m[3];if(m[2]==="level")ex[m[1]]=1}
     else if(m=l.match(/^v=(\d+)$/))ver=+m[1];
     else if(m=l.match(/^mute=(\d+)$/))n.mute=m[1]==="1";
-    else if(m=l.match(/^cur=(pull|push|squat)$/))n.cur=m[1];
-    else if(m=l.match(/^(?:(pull|push|squat)\s+)?(\d{4}-\d\d-\d\d):\s*([\d ]+)$/))n.sessions.push({ex:m[1]||"pull",date:m[2],sets:m[3].trim().split(/\s+/).map(Number)});
+    else if(m=l.match(/^cur=(pull|push|squat|dips)$/))n.cur=m[1];
+    else if(m=l.match(/^(?:(pull|push|squat|dips)\s+)?(\d{4}-\d\d-\d\d):\s*([\d ]+)$/))n.sessions.push({ex:m[1]||"pull",date:m[2],sets:m[3].trim().split(/\s+/).map(Number)});
   });
   if(ver<2&&ex.push)n.ex.push.level+=2; // сдвиг: в отжиманиях добавлены 2 новых первых уровня
   if(ver<3)n.ex.squat.rest=120; // новое время отдыха по умолчанию для приседаний
