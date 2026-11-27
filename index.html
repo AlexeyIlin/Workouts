@@ -1,291 +1,712 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Тренировки</title>
-<style>
-:root{--fg:#000;--chip:#f3f3f3;--mute:#b5b5b5;--btn:#2a2a2a;--line:#ddd;--red:#f05a5a}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:#fff;color:var(--fg);font-family:-apple-system,"SF Pro Display",Roboto,"Segoe UI",Helvetica,Arial,sans-serif}
-button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-.screen{display:none;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;padding:env(safe-area-inset-top,0) 20px calc(env(safe-area-inset-bottom,0) + 16px)}
-.screen.on{display:flex}
-.scroll{flex:1;overflow-y:auto;min-height:0}
-.big{width:100%;height:70px;border-radius:30px;font-size:24px;font-weight:600}
-.dark{background:var(--btn);color:#fff}
-.light{background:var(--chip)}
-/* main */
-.top{display:flex;justify-content:space-between;align-items:center;margin:40px 0 16px}
-h1{font-size:clamp(24px,7.5vw,34px);margin:0;font-weight:600}
-.titlebox{display:flex;align-items:baseline;gap:10px;white-space:nowrap;min-width:0}
-.icon{font-size:30px;padding:6px}
-.lvtag{font-size:clamp(15px,4.4vw,19px);color:#888;margin:0}
-.tabs{display:flex;gap:4px;margin:0 -8px 22px}
-.tabs button{flex:1 1 0;min-width:0;height:42px;padding:0;border-radius:14px;background:var(--chip);font-size:clamp(10px,3vw,12.5px);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.tabs .on{background:var(--btn);color:#fff}
-.chart{position:relative;height:190px;margin:8px 0 0 34px;border-left:1px solid #999;border-bottom:1px solid #999}
-.gl{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
-.gl span{position:absolute;left:-34px;top:-9px;font-size:13px;width:28px;text-align:right}
-.bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:5px;padding:0 2px}
-.bar{flex:1;position:relative;background:#000;border-radius:4px 4px 0 0;min-height:2px}
-.bar span{position:absolute;top:5px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:600}
-.bar.sm span{top:auto;bottom:100%;margin-bottom:2px;color:#000}
-.xl{display:flex;gap:5px;margin:6px 0 0 36px;font-size:11px}
-.xl div{flex:1;white-space:nowrap}
-.row{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #eee}
-.row .d{width:86px;color:var(--mute);font-size:20px;flex:none}
-.chip{flex:1;max-width:60px;height:60px;border-radius:20px;background:var(--chip);display:grid;place-items:center;font-size:24px}
-.empty{color:var(--mute);text-align:center;padding:30px 0}
-/* settings / levels */
-.hdr{display:flex;align-items:center;gap:10px;padding:18px 0;border-bottom:1px solid var(--line);font-size:18px}
-.hdr b{font-weight:600}.hdr .back{color:#444}
-.item{padding:16px 4px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left}
-.item small{display:block;color:var(--mute);font-size:15px;margin-top:6px}
-.item.cur .n{font-weight:700}
-.step{display:flex;align-items:center;gap:14px}
-.step button{width:44px;height:44px;border-radius:50%;background:var(--chip);font-size:22px}
-.sw{position:relative;width:52px;height:32px;flex:none}.sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;z-index:1}.sw i{position:absolute;inset:0;background:#ddd;border-radius:16px;transition:.2s}.sw i::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px #0003}.sw input:checked+i{background:var(--btn)}.sw input:checked+i::after{left:23px}
-.set{margin-top:18px;display:flex;gap:10px}.set button{flex:1;height:52px;border-radius:18px;background:var(--chip);font-size:16px}
-/* training */
-.cancel{align-self:flex-end;color:var(--mute);font-size:26px;margin-top:38px;padding:4px}
-.strip{display:flex;justify-content:space-around;background:var(--chip);border-radius:30px;padding:22px 0 16px;margin-top:14px}
-.strip div{width:50px;text-align:center;font-size:40px;color:#c4c4c4;position:relative;height:54px}
-.strip .cur{color:#000}
-.strip .cur::after{content:"";position:absolute;left:50%;bottom:-4px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--red)}
-.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.num{font-size:190px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
-.lbl{font-size:38px;color:var(--mute);margin-top:22px}
-.ctl{display:flex;gap:14px}.ctl .round{width:70px;flex:none;font-size:34px;border-radius:30px;background:var(--chip);height:70px}
-.ctl .big{flex:1}
-#toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#000;color:#fff;padding:12px 20px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center;max-width:90%}
-#toast.on{opacity:1}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Тренировки</title>
+  <style>
+    :root {
+      --fg: #000;
+      --chip: #f3f3f3;
+      --mute: #b5b5b5;
+      --btn: #2a2a2a;
+      --line: #ddd;
+      --red: #f05a5a
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #fff;
+      color: var(--fg);
+      font-family: -apple-system, "SF Pro Display", Roboto, "Segoe UI", Helvetica, Arial, sans-serif
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: 0;
+      background: none;
+      cursor: pointer
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 0) 20px calc(env(safe-area-inset-bottom, 0) + 16px)
+    }
+
+    .screen.on {
+      display: flex
+    }
+
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0
+    }
+
+    .big {
+      width: 100%;
+      height: 70px;
+      border-radius: 30px;
+      font-size: 24px;
+      font-weight: 600
+    }
+
+    .dark {
+      background: var(--btn);
+      color: #fff
+    }
+
+    .light {
+      background: var(--chip)
+    }
+
+    /* main */
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 40px 0 16px
+    }
+
+    h1 {
+      font-size: clamp(24px, 7.5vw, 34px);
+      margin: 0;
+      font-weight: 600
+    }
+
+    .titlebox {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      white-space: nowrap;
+      min-width: 0
+    }
+
+    .icon {
+      font-size: 30px;
+      padding: 6px
+    }
+
+    .lvtag {
+      font-size: clamp(15px, 4.4vw, 19px);
+      color: #888;
+      margin: 0
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin: 0 -8px 22px
+    }
+
+    .tabs button {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 42px;
+      padding: 0;
+      border-radius: 14px;
+      background: var(--chip);
+      font-size: clamp(10px, 3vw, 12.5px);
+      letter-spacing: -.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .tabs .on {
+      background: var(--btn);
+      color: #fff
+    }
+
+    .chart {
+      position: relative;
+      height: 190px;
+      margin: 8px 0 0 34px;
+      border-left: 1px solid #999;
+      border-bottom: 1px solid #999
+    }
+
+    .gl {
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-top: 1px solid var(--line)
+    }
+
+    .gl span {
+      position: absolute;
+      left: -34px;
+      top: -9px;
+      font-size: 13px;
+      width: 28px;
+      text-align: right
+    }
+
+    .bars {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      padding: 0 2px
+    }
+
+    .bar {
+      flex: 1;
+      position: relative;
+      background: #000;
+      border-radius: 4px 4px 0 0;
+      min-height: 2px
+    }
+
+    .bar span {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .bar.sm span {
+      top: auto;
+      bottom: 100%;
+      margin-bottom: 2px;
+      color: #000
+    }
+
+    .xl {
+      display: flex;
+      gap: 5px;
+      margin: 6px 0 0 36px;
+      font-size: 11px
+    }
+
+    .xl div {
+      flex: 1;
+      white-space: nowrap
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee
+    }
+
+    .row .d {
+      width: 86px;
+      color: var(--mute);
+      font-size: 20px;
+      flex: none
+    }
+
+    .chip {
+      flex: 1;
+      max-width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      background: var(--chip);
+      display: grid;
+      place-items: center;
+      font-size: 24px
+    }
+
+    .empty {
+      color: var(--mute);
+      text-align: center;
+      padding: 30px 0
+    }
+
+    /* settings / levels */
+    .hdr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 18px
+    }
+
+    .hdr b {
+      font-weight: 600
+    }
+
+    .hdr .back {
+      color: #444
+    }
+
+    .item {
+      padding: 16px 4px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      text-align: left
+    }
+
+    .item small {
+      display: block;
+      color: var(--mute);
+      font-size: 15px;
+      margin-top: 6px
+    }
+
+    .item.cur .n {
+      font-weight: 700
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .step button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--chip);
+      font-size: 22px
+    }
+
+    .sw {
+      position: relative;
+      width: 52px;
+      height: 32px;
+      flex: none
+    }
+
+    .sw input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      z-index: 1
+    }
+
+    .sw i {
+      position: absolute;
+      inset: 0;
+      background: #ddd;
+      border-radius: 16px;
+      transition: .2s
+    }
+
+    .sw i::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .2s;
+      box-shadow: 0 1px 3px #0003
+    }
+
+    .sw input:checked+i {
+      background: var(--btn)
+    }
+
+    .sw input:checked+i::after {
+      left: 23px
+    }
+
+    .set {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px
+    }
+
+    .set button {
+      flex: 1;
+      height: 52px;
+      border-radius: 18px;
+      background: var(--chip);
+      font-size: 16px
+    }
+
+    /* training */
+    .cancel {
+      align-self: flex-end;
+      color: var(--mute);
+      font-size: 26px;
+      margin-top: 38px;
+      padding: 4px
+    }
+
+    .strip {
+      display: flex;
+      justify-content: space-around;
+      background: var(--chip);
+      border-radius: 30px;
+      padding: 22px 0 16px;
+      margin-top: 14px
+    }
+
+    .strip div {
+      width: 50px;
+      text-align: center;
+      font-size: 40px;
+      color: #c4c4c4;
+      position: relative;
+      height: 54px
+    }
+
+    .strip .cur {
+      color: #000
+    }
+
+    .strip .cur::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -4px;
+      width: 9px;
+      height: 9px;
+      margin-left: -4.5px;
+      border-radius: 50%;
+      background: var(--red)
+    }
+
+    .mid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center
+    }
+
+    .num {
+      font-size: 190px;
+      font-weight: 600;
+      line-height: 1;
+      font-variant-numeric: tabular-nums
+    }
+
+    .lbl {
+      font-size: 38px;
+      color: var(--mute);
+      margin-top: 22px
+    }
+
+    .ctl {
+      display: flex;
+      gap: 14px
+    }
+
+    .ctl .round {
+      width: 70px;
+      flex: none;
+      font-size: 34px;
+      border-radius: 30px;
+      background: var(--chip);
+      height: 70px
+    }
+
+    .ctl .big {
+      flex: 1
+    }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 110px;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+      text-align: center;
+      max-width: 90%
+    }
+
+    #toast.on {
+      opacity: 1
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Главный экран -->
-<section class="screen on" id="main">
-  <div class="top"><div class="titlebox"><h1 id="title"></h1><div class="lvtag" id="lvTag"></div></div><button class="icon" id="bSettings" aria-label="Настройки">⚙︎</button></div>
-  <div class="tabs" id="tabs"></div>
-  <div class="scroll" id="statWrap"></div>
-  <button class="big dark" id="bStart"></button>
-</section>
+  <!-- Главный экран -->
+  <section class="screen on" id="main">
+    <div class="top">
+      <div class="titlebox">
+        <h1 id="title"></h1>
+        <div class="lvtag" id="lvTag"></div>
+      </div><button class="icon" id="bSettings" aria-label="Настройки">⚙︎</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="scroll" id="statWrap"></div>
+    <button class="big dark" id="bStart"></button>
+  </section>
 
-<!-- Настройки -->
-<section class="screen" id="settings">
-  <div class="hdr"><button class="back" id="sBack">‹ Назад</button><b>Настройки · <span id="exName"></span></b></div>
-  <div class="scroll">
-    <button class="item" id="bLevel"><span>Уровень<small id="lvSub"></small></span><span>›</span></button>
-    <div class="item"><span>Отдых, сек</span>
-      <div class="step"><button id="rMinus">−</button><b id="rVal" style="min-width:48px;text-align:center"></b><button id="rPlus">+</button></div></div>
-    <div class="item"><span>Выключить звук</span><label class="sw"><input type="checkbox" id="muteChk"><i></i></label></div>
-    <div class="item" style="display:block">Файл данных (.txt)<small>Данные всех упражнений хранятся в браузере. Сохраняйте копию в файл и загружайте обратно.</small><small id="storeState" style="margin-top:10px"></small>
-      <div class="set"><button id="bExport">Сохранить в .txt</button><button id="bImport">Загрузить .txt</button></div>
-      <input type="file" id="fileIn" accept=".txt,text/plain" hidden></div>
-    <div class="item" style="display:block">История тренировок<small id="clrSub"></small>
-      <div class="set"><button id="bClear" style="color:#d33">Очистить историю</button></div></div>
-  </div>
-</section>
+  <!-- Настройки -->
+  <section class="screen" id="settings">
+    <div class="hdr"><button class="back" id="sBack">‹ Назад</button><b>Настройки · <span id="exName"></span></b></div>
+    <div class="scroll">
+      <button class="item" id="bLevel"><span>Уровень<small id="lvSub"></small></span><span>›</span></button>
+      <div class="item"><span>Отдых, сек</span>
+        <div class="step"><button id="rMinus">−</button><b id="rVal"
+            style="min-width:48px;text-align:center"></b><button id="rPlus">+</button></div>
+      </div>
+      <div class="item"><span>Выключить звук</span><label class="sw"><input type="checkbox" id="muteChk"><i></i></label>
+      </div>
+      <div class="item" style="display:block">Файл данных (.txt)<small>Данные всех упражнений хранятся в браузере.
+          Сохраняйте копию в файл и загружайте обратно.</small><small id="storeState" style="margin-top:10px"></small>
+        <div class="set"><button id="bExport">Сохранить в .txt</button><button id="bImport">Загрузить .txt</button>
+        </div>
+        <input type="file" id="fileIn" accept=".txt,text/plain" hidden>
+      </div>
+      <div class="item" style="display:block">История тренировок<small id="clrSub"></small>
+        <div class="set"><button id="bClear" style="color:#d33">Очистить историю</button></div>
+      </div>
+    </div>
+  </section>
 
-<!-- Выбор уровня -->
-<section class="screen" id="levels">
-  <div class="hdr"><button class="back" id="lBack">‹ Настройки</button><b>Выбрать уровень</b></div>
-  <div class="scroll" id="lvList"></div>
-</section>
+  <!-- Выбор уровня -->
+  <section class="screen" id="levels">
+    <div class="hdr"><button class="back" id="lBack">‹ Настройки</button><b>Выбрать уровень</b></div>
+    <div class="scroll" id="lvList"></div>
+  </section>
 
-<!-- Тренировка -->
-<section class="screen" id="train">
-  <button class="cancel" id="bCancel">Отмена</button>
-  <div class="strip" id="strip"></div>
-  <div class="mid"><div class="num" id="num"></div><div class="lbl" id="lbl"></div></div>
-  <div class="ctl" id="ctlTrain"><button class="round" id="bMinus">−</button><button class="big light" id="bDone">Готово</button><button class="round" id="bPlus">+</button></div>
-  <div class="ctl" id="ctlRest" style="display:none"><button class="big light" id="bNext">Начать подход</button></div>
-</section>
-<div id="toast"></div>
+  <!-- Тренировка -->
+  <section class="screen" id="train">
+    <button class="cancel" id="bCancel">Отмена</button>
+    <div class="strip" id="strip"></div>
+    <div class="mid">
+      <div class="num" id="num"></div>
+      <div class="lbl" id="lbl"></div>
+    </div>
+    <div class="ctl" id="ctlTrain"><button class="round" id="bMinus">−</button><button class="big light"
+        id="bDone">Готово</button><button class="round" id="bPlus">+</button></div>
+    <div class="ctl" id="ctlRest" style="display:none"><button class="big light" id="bNext">Начать подход</button></div>
+  </section>
+  <div id="toast"></div>
 
-<script>
-const PULL=[[6,5,5,4,3],[7,6,5,4,4],[8,6,5,5,4],[8,7,5,5,5],[9,7,6,5,5],[10,7,6,6,5],[10,8,6,6,6],[11,8,7,6,6],[12,8,7,7,6],[12,9,7,7,7],[13,9,8,7,7],[14,9,8,8,7],[14,10,8,8,8],[15,10,9,8,8],[16,10,9,9,8],[16,11,9,9,9],[17,11,10,9,9],[18,11,10,10,9],[18,12,10,10,10],[19,12,11,10,10],[20,12,11,11,10],[20,13,11,11,11],[21,13,12,11,11],[22,13,12,12,11],[22,14,12,12,12],[23,14,13,12,12],[24,14,13,13,12],[24,15,13,13,13],[25,15,14,13,13],[26,15,14,14,13],[27,15,15,14,14],[27,16,16,15,14],[28,17,16,15,15],[28,17,17,16,16],[28,18,18,17,16],[28,19,18,18,17]];
-// Отжимания: 2 вводных уровня + 15-недельная программа (неделя = уровень)
-const PUSH=[[10,10,5,5,5],[15,10,10,10,5],[20,20,15,15,10],[25,25,20,15,10],[30,30,25,20,15],[35,30,25,20,15],[40,35,25,25,15],[40,40,30,30,20],[45,40,35,35,25],[45,45,35,35,25],[50,45,35,35,30],[50,50,40,40,35],[55,50,40,40,35],[60,55,40,40,35],[60,60,45,45,40],[65,60,45,45,40],[65,65,45,45,40]];
-// Приседания: 15-недельная таблица (неделя = уровень) + 30 уровней продолжения (до 45)
-const SQUAT=[[8,10,8,8,6],[10,12,10,10,8],[10,15,12,12,10],[15,15,15,15,12],[15,20,18,16,12],[15,20,20,20,15],[20,25,20,20,20],[20,25,25,25,20],[25,30,30,25,20],[25,30,30,30,25],[30,30,35,30,25],[30,35,35,30,30],[30,40,35,35,30],[35,40,35,35,35],[40,40,40,40,40],[45,45,40,40,40],[45,45,45,45,40],[50,50,45,45,40],[50,50,50,45,45],[55,55,50,45,45],[55,55,50,50,50],[60,55,55,50,50],[60,60,55,55,50],[60,60,60,55,55],[65,65,60,55,55],[65,65,65,60,55],[70,65,65,60,60],[70,70,65,65,60],[75,70,70,65,60],[75,75,70,65,65],[80,75,70,70,65],[80,80,75,70,65],[80,80,75,75,70],[85,80,80,75,70],[85,85,80,75,75],[90,85,85,75,75],[90,90,85,80,75],[90,90,90,80,80],[95,90,90,85,80],[95,95,90,85,85],[100,95,90,90,85],[100,100,95,90,85],[100,100,100,90,90],[105,100,100,95,90],[105,105,100,95,95]];
-// Брусья: 17-недельная таблица (неделя = уровень)
-const DIPS=[[10,5,5,3,2],[15,15,10,5,5],[20,20,15,15,10],[25,25,20,15,10],[30,30,25,20,15],[35,30,25,20,15],[40,35,25,25,15],[40,40,30,30,20],[45,40,35,35,25],[45,45,35,35,25],[50,45,35,35,30],[50,50,40,40,35],[55,50,40,40,35],[60,55,40,40,35],[60,60,45,45,40],[65,60,45,45,40],[65,65,45,45,40]];
-const EX={
-  pull:{name:"Подтягивания",start:"Начать подтягивания",levels:PULL},
-  push:{name:"Отжимания",start:"Начать отжимания",levels:PUSH},
-  squat:{name:"Приседания",start:"Начать приседания",levels:SQUAT},
-  dips:{name:"Брусья",start:"Начать брусья",levels:DIPS}
-};
-const IDS=Object.keys(EX);
-const DEF={pull:{level:1,rest:120},push:{level:1,rest:90},squat:{level:1,rest:120},dips:{level:1,rest:120}};
-const KEY="pullups_data_txt";
-const $=id=>document.getElementById(id);
-const fresh=()=>({mute:false,cur:"pull",ex:{pull:{...DEF.pull},push:{...DEF.push},squat:{...DEF.squat},dips:{...DEF.dips}},sessions:[]});
-let S=fresh();
-const E=()=>S.ex[S.cur], LV=()=>EX[S.cur].levels;
+  <script>
+    const PULL = [[6, 5, 5, 4, 3], [7, 6, 5, 4, 4], [8, 6, 5, 5, 4], [8, 7, 5, 5, 5], [9, 7, 6, 5, 5], [10, 7, 6, 6, 5], [10, 8, 6, 6, 6], [11, 8, 7, 6, 6], [12, 8, 7, 7, 6], [12, 9, 7, 7, 7], [13, 9, 8, 7, 7], [14, 9, 8, 8, 7], [14, 10, 8, 8, 8], [15, 10, 9, 8, 8], [16, 10, 9, 9, 8], [16, 11, 9, 9, 9], [17, 11, 10, 9, 9], [18, 11, 10, 10, 9], [18, 12, 10, 10, 10], [19, 12, 11, 10, 10], [20, 12, 11, 11, 10], [20, 13, 11, 11, 11], [21, 13, 12, 11, 11], [22, 13, 12, 12, 11], [22, 14, 12, 12, 12], [23, 14, 13, 12, 12], [24, 14, 13, 13, 12], [24, 15, 13, 13, 13], [25, 15, 14, 13, 13], [26, 15, 14, 14, 13], [27, 15, 15, 14, 14], [27, 16, 16, 15, 14], [28, 17, 16, 15, 15], [28, 17, 17, 16, 16], [28, 18, 18, 17, 16], [28, 19, 18, 18, 17]];
+    // Отжимания: 2 вводных уровня + 15-недельная программа (неделя = уровень)
+    const PUSH = [[10, 10, 5, 5, 5], [15, 10, 10, 10, 5], [20, 20, 15, 15, 10], [25, 25, 20, 15, 10], [30, 30, 25, 20, 15], [35, 30, 25, 20, 15], [40, 35, 25, 25, 15], [40, 40, 30, 30, 20], [45, 40, 35, 35, 25], [45, 45, 35, 35, 25], [50, 45, 35, 35, 30], [50, 50, 40, 40, 35], [55, 50, 40, 40, 35], [60, 55, 40, 40, 35], [60, 60, 45, 45, 40], [65, 60, 45, 45, 40], [65, 65, 45, 45, 40]];
+    // Приседания: 15-недельная таблица (неделя = уровень) + 30 уровней продолжения (до 45)
+    const SQUAT = [[8, 10, 8, 8, 6], [10, 12, 10, 10, 8], [10, 15, 12, 12, 10], [15, 15, 15, 15, 12], [15, 20, 18, 16, 12], [15, 20, 20, 20, 15], [20, 25, 20, 20, 20], [20, 25, 25, 25, 20], [25, 30, 30, 25, 20], [25, 30, 30, 30, 25], [30, 30, 35, 30, 25], [30, 35, 35, 30, 30], [30, 40, 35, 35, 30], [35, 40, 35, 35, 35], [40, 40, 40, 40, 40], [45, 45, 40, 40, 40], [45, 45, 45, 45, 40], [50, 50, 45, 45, 40], [50, 50, 50, 45, 45], [55, 55, 50, 45, 45], [55, 55, 50, 50, 50], [60, 55, 55, 50, 50], [60, 60, 55, 55, 50], [60, 60, 60, 55, 55], [65, 65, 60, 55, 55], [65, 65, 65, 60, 55], [70, 65, 65, 60, 60], [70, 70, 65, 65, 60], [75, 70, 70, 65, 60], [75, 75, 70, 65, 65], [80, 75, 70, 70, 65], [80, 80, 75, 70, 65], [80, 80, 75, 75, 70], [85, 80, 80, 75, 70], [85, 85, 80, 75, 75], [90, 85, 85, 75, 75], [90, 90, 85, 80, 75], [90, 90, 90, 80, 80], [95, 90, 90, 85, 80], [95, 95, 90, 85, 85], [100, 95, 90, 90, 85], [100, 100, 95, 90, 85], [100, 100, 100, 90, 90], [105, 100, 100, 95, 90], [105, 105, 100, 95, 95]];
+    // Брусья: 17-недельная таблица (неделя = уровень)
+    const DIPS = [[10, 5, 5, 3, 2], [15, 15, 10, 5, 5], [20, 20, 15, 15, 10], [25, 25, 20, 15, 10], [30, 30, 25, 20, 15], [35, 30, 25, 20, 15], [40, 35, 25, 25, 15], [40, 40, 30, 30, 20], [45, 40, 35, 35, 25], [45, 45, 35, 35, 25], [50, 45, 35, 35, 30], [50, 50, 40, 40, 35], [55, 50, 40, 40, 35], [60, 55, 40, 40, 35], [60, 60, 45, 45, 40], [65, 60, 45, 45, 40], [65, 65, 45, 45, 40]];
+    const EX = {
+      pull: { name: "Подтягивания", start: "Начать подтягивания", levels: PULL },
+      push: { name: "Отжимания", start: "Начать отжимания", levels: PUSH },
+      squat: { name: "Приседания", start: "Начать приседания", levels: SQUAT },
+      dips: { name: "Брусья", start: "Начать брусья", levels: DIPS }
+    };
+    const IDS = Object.keys(EX);
+    const DEF = { pull: { level: 1, rest: 120 }, push: { level: 1, rest: 90 }, squat: { level: 1, rest: 120 }, dips: { level: 1, rest: 120 } };
+    const KEY = "pullups_data_txt";
+    const $ = id => document.getElementById(id);
+    const fresh = () => ({ mute: false, cur: "pull", ex: { pull: { ...DEF.pull }, push: { ...DEF.push }, squat: { ...DEF.squat }, dips: { ...DEF.dips } }, sessions: [] });
+    let S = fresh();
+    const E = () => S.ex[S.cur], LV = () => EX[S.cur].levels;
 
-/* ---- данные: формат txt ----
-cur=pull
-mute=0
-v=3
-pull.level=1
-pull.rest=120
-push.level=1 ...
-pull 2026-09-25: 11 8 7 7 7
-(старые файлы без упражнения читаются как подтягивания) */
-function serialize(){
-  let o=`v=3\ncur=${S.cur}\nmute=${S.mute?1:0}\n`;
-  IDS.forEach(k=>o+=`${k}.level=${S.ex[k].level}\n${k}.rest=${S.ex[k].rest}\n`);
-  return o+S.sessions.map(s=>`${s.ex} ${s.date}: ${s.sets.join(" ")}`).join("\n")+"\n";
-}
-function parse(t){
-  const n=fresh();let m,ver=1;const ex={};
-  t.split(/\r?\n/).forEach(l=>{l=l.trim();
-    if(m=l.match(/^(level|rest)=(\d+)$/))n.ex.pull[m[1]]=+m[2];
-    else if(m=l.match(/^(pull|push|squat|dips)\.(level|rest)=(\d+)$/)){n.ex[m[1]][m[2]]=+m[3];if(m[2]==="level")ex[m[1]]=1}
-    else if(m=l.match(/^v=(\d+)$/))ver=+m[1];
-    else if(m=l.match(/^mute=(\d+)$/))n.mute=m[1]==="1";
-    else if(m=l.match(/^cur=(pull|push|squat|dips)$/))n.cur=m[1];
-    else if(m=l.match(/^(?:(pull|push|squat|dips)\s+)?(\d{4}-\d\d-\d\d):\s*([\d ]+)$/))n.sessions.push({ex:m[1]||"pull",date:m[2],sets:m[3].trim().split(/\s+/).map(Number)});
-  });
-  if(ver<2&&ex.push)n.ex.push.level+=2; // сдвиг: в отжиманиях добавлены 2 новых первых уровня
-  if(ver<3)n.ex.squat.rest=120; // новое время отдыха по умолчанию для приседаний
-  IDS.forEach(k=>{n.ex[k].level=Math.min(Math.max(n.ex[k].level,1),EX[k].levels.length)});
-  return n;
-}
-const IDB={
-  open(){return new Promise((res,rej)=>{try{const r=indexedDB.open("pullups",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})},
-  async get(){const db=await this.open();return new Promise((res,rej)=>{const q=db.transaction("kv").objectStore("kv").get(KEY);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})},
-  async set(v){const db=await this.open();return new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,KEY);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}
-};
-function lsOk(){try{localStorage.setItem("_t","1");localStorage.removeItem("_t");return true}catch(e){return false}}
-function storageMsg(){
-  if(location.protocol==="file:")return "⚠️ Приложение открыто как файл — данные могут не сохраняться. Откройте его по ссылке (https) в Safari.";
-  if(!lsOk())return "⚠️ Хранилище недоступно (приватный режим?). Откройте в обычной вкладке.";
-  return "✅ Данные сохраняются на этом устройстве.";
-}
-function save(){
-  const t=serialize();
-  try{localStorage.setItem(KEY,t)}catch(e){}
-  IDB.set(t).catch(()=>{});
-}
-function load(){
-  let had=false;
-  try{const t=localStorage.getItem(KEY);if(t){S=parse(t);had=true}}catch(e){}
-  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
-  if(!had)IDB.get().then(t=>{if(t){S=parse(t);renderMain();renderSettings()}}).catch(()=>{});
-}
+    /* ---- данные: формат txt ----
+    cur=pull
+    mute=0
+    v=3
+    pull.level=1
+    pull.rest=120
+    push.level=1 ...
+    pull 2026-09-25: 11 8 7 7 7
+    (старые файлы без упражнения читаются как подтягивания) */
+    function serialize() {
+      let o = `v=3\ncur=${S.cur}\nmute=${S.mute ? 1 : 0}\n`;
+      IDS.forEach(k => o += `${k}.level=${S.ex[k].level}\n${k}.rest=${S.ex[k].rest}\n`);
+      return o + S.sessions.map(s => `${s.ex} ${s.date}: ${s.sets.join(" ")}`).join("\n") + "\n";
+    }
+    function parse(t) {
+      const n = fresh(); let m, ver = 1; const ex = {};
+      t.split(/\r?\n/).forEach(l => {
+        l = l.trim();
+        if (m = l.match(/^(level|rest)=(\d+)$/)) n.ex.pull[m[1]] = +m[2];
+        else if (m = l.match(/^(pull|push|squat|dips)\.(level|rest)=(\d+)$/)) { n.ex[m[1]][m[2]] = +m[3]; if (m[2] === "level") ex[m[1]] = 1 }
+        else if (m = l.match(/^v=(\d+)$/)) ver = +m[1];
+        else if (m = l.match(/^mute=(\d+)$/)) n.mute = m[1] === "1";
+        else if (m = l.match(/^cur=(pull|push|squat|dips)$/)) n.cur = m[1];
+        else if (m = l.match(/^(?:(pull|push|squat|dips)\s+)?(\d{4}-\d\d-\d\d):\s*([\d ]+)$/)) n.sessions.push({ ex: m[1] || "pull", date: m[2], sets: m[3].trim().split(/\s+/).map(Number) });
+      });
+      if (ver < 2 && ex.push) n.ex.push.level += 2; // сдвиг: в отжиманиях добавлены 2 новых первых уровня
+      if (ver < 3) n.ex.squat.rest = 120; // новое время отдыха по умолчанию для приседаний
+      IDS.forEach(k => { n.ex[k].level = Math.min(Math.max(n.ex[k].level, 1), EX[k].levels.length) });
+      return n;
+    }
+    const IDB = {
+      open() { return new Promise((res, rej) => { try { const r = indexedDB.open("pullups", 1); r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error) } catch (e) { rej(e) } }) },
+      async get() { const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction("kv").objectStore("kv").get(KEY); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error) }) },
+      async set(v) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("kv", "readwrite"); t.objectStore("kv").put(v, KEY); t.oncomplete = () => res(); t.onerror = () => rej(t.error) }) }
+    };
+    function lsOk() { try { localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); return true } catch (e) { return false } }
+    function storageMsg() {
+      if (location.protocol === "file:") return "⚠️ Приложение открыто как файл — данные могут не сохраняться. Откройте его по ссылке (https) в Safari.";
+      if (!lsOk()) return "⚠️ Хранилище недоступно (приватный режим?). Откройте в обычной вкладке.";
+      return "✅ Данные сохраняются на этом устройстве.";
+    }
+    function save() {
+      const t = serialize();
+      try { localStorage.setItem(KEY, t) } catch (e) { }
+      IDB.set(t).catch(() => { });
+    }
+    function load() {
+      let had = false;
+      try { const t = localStorage.getItem(KEY); if (t) { S = parse(t); had = true } } catch (e) { }
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist() } catch (e) { }
+      if (!had) IDB.get().then(t => { if (t) { S = parse(t); renderMain(); renderSettings() } }).catch(() => { });
+    }
 
-const fmtDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"short"});
-const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
-function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),2800)}
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id))}
+    const fmtDate = iso => new Date(iso + "T12:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+    const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` };
+    function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2800) }
+    function show(id) { document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id)) }
 
-/* ---- главный экран ---- */
-function renderMain(){
-  $("title").textContent=EX[S.cur].name;$("lvTag").textContent="Уровень "+E().level;$("bStart").textContent=EX[S.cur].start;
-  $("tabs").innerHTML=IDS.map(k=>`<button data-k="${k}" class="${k===S.cur?"on":""}">${EX[k].name}</button>`).join("");
-  const ss=S.sessions.filter(s=>s.ex===S.cur);
-  if(!ss.length){$("statWrap").innerHTML='<div class="empty">Пока нет тренировок. Выберите свой уровень в настройках и нажмите кнопку ниже, чтобы начать.</div>';return}
-  const last=ss.slice(-10),tot=last.map(s=>s.sets.reduce((a,b)=>a+b,0));
-  const step=Math.max(10,Math.ceil(Math.max(...tot)/40)*10);
-  const max=Math.ceil(Math.max(...tot)/step)*step;
-  let g="";for(let v=0;v<=max;v+=step)g+=`<div class="gl" style="bottom:${v/max*100}%"><span>${v}</span></div>`;
-  const bars=tot.map(t=>`<div class="bar${t/max*190<20?" sm":""}" style="height:${t/max*100}%"><span>${t}</span></div>`).join("");
-  const xl=last.map((s,i)=>`<div>${i%2===0?fmtDate(s.date):""}</div>`).join("");
-  const rows=ss.slice().reverse().map(s=>`<div class="row"><div class="d">${fmtDate(s.date)}</div>${s.sets.map(v=>`<div class="chip">${v}</div>`).join("")}</div>`).join("");
-  $("statWrap").innerHTML=`<div class="chart">${g}<div class="bars">${bars}</div></div><div class="xl">${xl}</div><div style="margin-top:24px">${rows}</div>`;
-}
-$("tabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.cur=b.dataset.k;save();renderMain()};
+    /* ---- главный экран ---- */
+    function renderMain() {
+      $("title").textContent = EX[S.cur].name; $("lvTag").textContent = "Уровень " + E().level; $("bStart").textContent = EX[S.cur].start;
+      $("tabs").innerHTML = IDS.map(k => `<button data-k="${k}" class="${k === S.cur ? "on" : ""}">${EX[k].name}</button>`).join("");
+      const ss = S.sessions.filter(s => s.ex === S.cur);
+      if (!ss.length) { $("statWrap").innerHTML = '<div class="empty">Пока нет тренировок. Выберите свой уровень в настройках и нажмите кнопку ниже, чтобы начать.</div>'; return }
+      const last = ss.slice(-10), tot = last.map(s => s.sets.reduce((a, b) => a + b, 0));
+      const step = Math.max(10, Math.ceil(Math.max(...tot) / 40) * 10);
+      const max = Math.ceil(Math.max(...tot) / step) * step;
+      let g = ""; for (let v = 0; v <= max; v += step)g += `<div class="gl" style="bottom:${v / max * 100}%"><span>${v}</span></div>`;
+      const bars = tot.map(t => `<div class="bar${t / max * 190 < 20 ? " sm" : ""}" style="height:${t / max * 100}%"><span>${t}</span></div>`).join("");
+      const xl = last.map((s, i) => `<div>${i % 2 === 0 ? fmtDate(s.date) : ""}</div>`).join("");
+      const rows = ss.slice().reverse().map(s => `<div class="row"><div class="d">${fmtDate(s.date)}</div>${s.sets.map(v => `<div class="chip">${v}</div>`).join("")}</div>`).join("");
+      $("statWrap").innerHTML = `<div class="chart">${g}<div class="bars">${bars}</div></div><div class="xl">${xl}</div><div style="margin-top:24px">${rows}</div>`;
+    }
+    $("tabs").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.cur = b.dataset.k; save(); renderMain() };
 
-/* ---- настройки ---- */
-function renderSettings(){
-  const name=EX[S.cur].name;
-  $("exName").textContent=name;$("muteChk").checked=S.mute;$("storeState").textContent=storageMsg();
-  $("rVal").textContent=E().rest;
-  $("lvSub").textContent=`Уровень ${E().level}: `+LV()[E().level-1].join(" + ");
-  $("clrSub").textContent=`Удаляет статистику упражнения «${name}». Уровень и время отдыха сохранятся.`;
-}
-function renderLevels(){
-  $("lvList").innerHTML=LV().map((l,i)=>{const n=i+1;
-    return `<button class="item${n===E().level?" cur":""}" data-n="${n}"><span><span class="n">Уровень ${n}</span><small>Схема подходов: ${l.join(" + ")}</small></span></button>`}).join("");
-}
-$("lvList").onclick=e=>{const b=e.target.closest(".item");if(!b)return;E().level=+b.dataset.n;save();renderSettings();show("settings")};
-$("bSettings").onclick=()=>{renderSettings();show("settings")};
-$("sBack").onclick=()=>{renderMain();show("main")};
-$("bLevel").onclick=()=>{renderLevels();show("levels")};
-$("lBack").onclick=()=>show("settings");
-$("muteChk").onchange=e=>{S.mute=e.target.checked;save()};
-$("rMinus").onclick=()=>{E().rest=Math.max(10,E().rest-10);save();renderSettings()};
-$("rPlus").onclick=()=>{E().rest=Math.min(600,E().rest+10);save();renderSettings()};
-$("bExport").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([serialize()],{type:"text/plain"}));a.download="workouts.txt";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$("bImport").onclick=()=>$("fileIn").click();
-let clearArmed=null;
-$("bClear").onclick=()=>{
-  const b=$("bClear");
-  if(!clearArmed){b.textContent="Нажмите ещё раз для подтверждения";clearArmed=setTimeout(()=>{clearArmed=null;b.textContent="Очистить историю"},3000);return}
-  clearTimeout(clearArmed);clearArmed=null;b.textContent="Очистить историю";
-  S.sessions=S.sessions.filter(s=>s.ex!==S.cur);save();renderMain();toast("История очищена");
-};
-$("fileIn").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{S=parse(String(r.result));save();renderMain();renderSettings();toast("Данные загружены")};r.readAsText(f);e.target.value=""};
+    /* ---- настройки ---- */
+    function renderSettings() {
+      const name = EX[S.cur].name;
+      $("exName").textContent = name; $("muteChk").checked = S.mute; $("storeState").textContent = storageMsg();
+      $("rVal").textContent = E().rest;
+      $("lvSub").textContent = `Уровень ${E().level}: ` + LV()[E().level - 1].join(" + ");
+      $("clrSub").textContent = `Удаляет статистику упражнения «${name}». Уровень и время отдыха сохранятся.`;
+    }
+    function renderLevels() {
+      $("lvList").innerHTML = LV().map((l, i) => {
+        const n = i + 1;
+        return `<button class="item${n === E().level ? " cur" : ""}" data-n="${n}"><span><span class="n">Уровень ${n}</span><small>Схема подходов: ${l.join(" + ")}</small></span></button>`
+      }).join("");
+    }
+    $("lvList").onclick = e => { const b = e.target.closest(".item"); if (!b) return; E().level = +b.dataset.n; save(); renderSettings(); show("settings") };
+    $("bSettings").onclick = () => { renderSettings(); show("settings") };
+    $("sBack").onclick = () => { renderMain(); show("main") };
+    $("bLevel").onclick = () => { renderLevels(); show("levels") };
+    $("lBack").onclick = () => show("settings");
+    $("muteChk").onchange = e => { S.mute = e.target.checked; save() };
+    $("rMinus").onclick = () => { E().rest = Math.max(10, E().rest - 10); save(); renderSettings() };
+    $("rPlus").onclick = () => { E().rest = Math.min(600, E().rest + 10); save(); renderSettings() };
+    $("bExport").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([serialize()], { type: "text/plain" })); a.download = "workouts.txt"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000) };
+    $("bImport").onclick = () => $("fileIn").click();
+    let clearArmed = null;
+    $("bClear").onclick = () => {
+      const b = $("bClear");
+      if (!clearArmed) { b.textContent = "Нажмите ещё раз для подтверждения"; clearArmed = setTimeout(() => { clearArmed = null; b.textContent = "Очистить историю" }, 3000); return }
+      clearTimeout(clearArmed); clearArmed = null; b.textContent = "Очистить историю";
+      S.sessions = S.sessions.filter(s => s.ex !== S.cur); save(); renderMain(); toast("История очищена");
+    };
+    $("fileIn").onchange = e => {
+      const f = e.target.files[0]; if (!f) return; const r = new FileReader();
+      r.onload = () => { S = parse(String(r.result)); save(); renderMain(); renderSettings(); toast("Данные загружены") }; r.readAsText(f); e.target.value = ""
+    };
 
-/* ---- звук ---- */
-let T=null,ctx=null,timer=null;
-function unlockAudio(){
-  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
-  try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();if(ctx.state!=="running")ctx.resume()}catch(e){}
-}
-function tone(f,t0,dur,vol){const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=f;o.connect(g);g.connect(ctx.destination);
-  g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);o.start(t0);o.stop(t0+dur+0.05)}
-function bell(){if(S.mute)return;try{unlockAudio();const t=ctx.currentTime;[[1320,.3,.9],[1320*2.76,.1,.5],[1320*5.4,.04,.3]].forEach(([f,v,d])=>tone(f,t,d,v))}catch(e){}}
-function gong(){
-  if(!S.mute)try{unlockAudio();const t=ctx.currentTime;
-    [[523.25,0],[659.25,.14],[783.99,.28],[1046.5,.42]].forEach(([f,d],i)=>{const L=i===3?1.6:.5;
-      tone(f,t+d,L,.28);tone(f*2,t+d,L*.6,.1);tone(f*3,t+d,L*.3,.04)});
-  }catch(e){}
-  if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}
+    /* ---- звук ---- */
+    let T = null, ctx = null, timer = null;
+    function unlockAudio() {
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback" } catch (e) { }
+      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state !== "running") ctx.resume() } catch (e) { }
+    }
+    function tone(f, t0, dur, vol) {
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); o.start(t0); o.stop(t0 + dur + 0.05)
+    }
+    function bell() { if (S.mute) return; try { unlockAudio(); const t = ctx.currentTime;[[1320, .3, .9], [1320 * 2.76, .1, .5], [1320 * 5.4, .04, .3]].forEach(([f, v, d]) => tone(f, t, d, v)) } catch (e) { } }
+    function gong() {
+      if (!S.mute) try {
+        unlockAudio(); const t = ctx.currentTime;
+        [[523.25, 0], [659.25, .14], [783.99, .28], [1046.5, .42]].forEach(([f, d], i) => {
+          const L = i === 3 ? 1.6 : .5;
+          tone(f, t + d, L, .28); tone(f * 2, t + d, L * .6, .1); tone(f * 3, t + d, L * .3, .04)
+        });
+      } catch (e) { }
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200])
+    }
 
-/* ---- тренировка ---- */
-function strip(){$("strip").innerHTML=T.targets.map((t,i)=>`<div class="${i===T.idx?"cur":""}">${i<T.idx?T.done[i]:t}</div>`).join("")}
-function startTraining(){
-  unlockAudio();
-  T={targets:LV()[E().level-1],done:[],idx:0,reps:0};showTrainSet();
-}
-function showTrainSet(){
-  clearInterval(timer);T.reps=T.targets[T.idx];strip();
-  $("num").textContent=T.reps;$("lbl").textContent="Цель";
-  $("ctlTrain").style.display="flex";$("ctlRest").style.display="none";show("train");
-}
-function showRest(){
-  strip();$("lbl").textContent="Отдыхаем";
-  $("ctlTrain").style.display="none";$("ctlRest").style.display="flex";
-  const end=Date.now()+E().rest*1000;
-  let last=-1;
-  const tick=()=>{const left=Math.max(0,Math.ceil((end-Date.now())/1000));
-    $("num").textContent=Math.floor(left/60)+":"+String(left%60).padStart(2,"0");
-    if(left!==last){last=left;if(left>=1&&left<=5)bell()}
-    if(left===0){clearInterval(timer);gong();showTrainSet()}};
-  clearInterval(timer);tick();timer=setInterval(tick,250);
-}
-function finish(){
-  clearInterval(timer);
-  S.sessions.push({ex:S.cur,date:today(),sets:T.done.slice()});
-  const ok=T.done.every((v,i)=>v>=T.targets[i]);
-  if(ok&&E().level<LV().length){E().level++;toast(`Уровень пройден! Следующий: уровень ${E().level}`)}
-  else if(!ok)toast(`Уровень ${E().level} остаётся`);
-  save();renderMain();show("main");
-}
-$("bStart").onclick=startTraining;
-$("bMinus").onclick=()=>{T.reps=Math.max(0,T.reps-1);$("num").textContent=T.reps};
-$("bPlus").onclick=()=>{T.reps++;$("num").textContent=T.reps};
-$("bDone").onclick=()=>{unlockAudio();T.done.push(T.reps);T.idx++;T.idx>=T.targets.length?finish():showRest()};
-$("bNext").onclick=()=>{unlockAudio();showTrainSet()};
-$("bCancel").onclick=()=>{clearInterval(timer);T=null;renderMain();show("main")};
+    /* ---- тренировка ---- */
+    function strip() { $("strip").innerHTML = T.targets.map((t, i) => `<div class="${i === T.idx ? "cur" : ""}">${i < T.idx ? T.done[i] : t}</div>`).join("") }
+    function startTraining() {
+      unlockAudio();
+      T = { targets: LV()[E().level - 1], done: [], idx: 0, reps: 0 }; showTrainSet();
+    }
+    function showTrainSet() {
+      clearInterval(timer); T.reps = T.targets[T.idx]; strip();
+      $("num").textContent = T.reps; $("lbl").textContent = "Цель";
+      $("ctlTrain").style.display = "flex"; $("ctlRest").style.display = "none"; show("train");
+    }
+    function showRest() {
+      strip(); $("lbl").textContent = "Отдыхаем";
+      $("ctlTrain").style.display = "none"; $("ctlRest").style.display = "flex";
+      const end = Date.now() + E().rest * 1000;
+      let last = -1;
+      const tick = () => {
+        const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+        $("num").textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0");
+        if (left !== last) { last = left; if (left >= 1 && left <= 5) bell() }
+        if (left === 0) { clearInterval(timer); gong(); showTrainSet() }
+      };
+      clearInterval(timer); tick(); timer = setInterval(tick, 250);
+    }
+    function finish() {
+      clearInterval(timer);
+      S.sessions.push({ ex: S.cur, date: today(), sets: T.done.slice() });
+      const ok = T.done.every((v, i) => v >= T.targets[i]);
+      if (ok && E().level < LV().length) { E().level++; toast(`Уровень пройден! Следующий: уровень ${E().level}`) }
+      else if (!ok) toast(`Уровень ${E().level} остаётся`);
+      save(); renderMain(); show("main");
+    }
+    $("bStart").onclick = startTraining;
+    $("bMinus").onclick = () => { T.reps = Math.max(0, T.reps - 1); $("num").textContent = T.reps };
+    $("bPlus").onclick = () => { T.reps++; $("num").textContent = T.reps };
+    $("bDone").onclick = () => { unlockAudio(); T.done.push(T.reps); T.idx++; T.idx >= T.targets.length ? finish() : showRest() };
+    $("bNext").onclick = () => { unlockAudio(); showTrainSet() };
+    $("bCancel").onclick = () => { clearInterval(timer); T = null; renderMain(); show("main") };
 
-load();renderMain();
-</script>
+    load(); renderMain();
+  </script>
 </body>
+
 </html>
